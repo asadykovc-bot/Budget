@@ -567,7 +567,7 @@ function escapeHTML(value) {
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
-  navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+  navigator.serviceWorker.register("./service-worker.js?v=4").catch(() => {});
 }
 
 setInterval(() => {
