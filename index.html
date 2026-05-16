@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d0d0d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Budget">
+  <title>Budget</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <h1>Budget</h1>
+      <p class="week-range" id="weekLabel">Loading...</p>
+    </header>
+
+    <nav class="tabs" aria-label="Budget sections">
+      <button class="tab active" type="button" data-tab="overview">Overview</button>
+      <button class="tab" type="button" data-tab="credits">Credits</button>
+      <button class="tab" type="button" data-tab="settings">Settings</button>
+    </nav>
+
+    <section class="panel active" id="panel-overview">
+      <article class="week-summary" id="weekSummary" hidden>
+        <div class="summary-title">Last week summary</div>
+        <div class="summary-text" id="weekSummaryText"></div>
+      </article>
+
+      <article class="alert yellow" id="alertReserve" hidden>Weekly budget exhausted, spending from reserve.</article>
+      <article class="alert red" id="alertNegative" hidden>Reserve is negative. Spending is below zero.</article>
+
+      <article class="card budget-card">
+        <div class="budget-top">
+          <div>
+            <div class="eyebrow">This week</div>
+            <div class="big-money" id="remainingDisplay">$0.00</div>
+            <div class="muted-line" id="spentDisplay">spent $0.00 of $0.00</div>
+          </div>
+          <div class="week-chip" id="weekDates"></div>
+        </div>
+
+        <div class="progress-block">
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-labels">
+            <span id="progressLeft">$0.00 left</span>
+            <span id="progressBudget">of $0.00</span>
+          </div>
+        </div>
+
+        <div class="metric-row">
+          <span>Debt payment</span>
+          <strong id="debtWeeklyDisplay">-$0.00/wk</strong>
+        </div>
+        <div class="metric-row reserve-row">
+          <span>Reserve bank</span>
+          <strong id="reserveDisplay">$0.00</strong>
+        </div>
+      </article>
+
+      <article class="card form-card">
+        <h2>Add Expense</h2>
+        <div class="form-grid two">
+          <label>
+            <span>Amount</span>
+            <input id="expenseAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$">
+          </label>
+          <label>
+            <span>Description</span>
+            <input id="expenseDesc" type="text" autocomplete="off" placeholder="Coffee">
+          </label>
+        </div>
+        <button class="btn primary full" id="addExpenseBtn" type="button">+ Add</button>
+      </article>
+
+      <article class="list-card">
+        <div class="list-title">History</div>
+        <div id="historyContainer"></div>
+      </article>
+    </section>
+
+    <section class="panel" id="panel-credits">
+      <article class="card debt-card">
+        <div class="eyebrow">Current Debt</div>
+        <div class="debt-main">
+          <div>
+            <div class="big-money debt" id="debtLeftDisplay">$0.00</div>
+            <div class="muted-line" id="debtTermDisplay">No active debt</div>
+          </div>
+          <div class="weekly-pill" id="debtPaymentDisplay">-$0.00/wk</div>
+        </div>
+        <div class="metric-row">
+          <span>Weekly spending after debt</span>
+          <strong id="afterDebtDisplay">$0.00</strong>
+        </div>
+      </article>
+
+      <article class="card form-card">
+        <h2>Plan Credit</h2>
+        <div class="form-grid two">
+          <label>
+            <span>New money</span>
+            <input id="planAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$0 for refinance">
+          </label>
+          <label>
+            <span>New term</span>
+            <input id="planWeeks" type="number" inputmode="numeric" min="1" step="1" placeholder="Weeks">
+          </label>
+        </div>
+        <label>
+          <span>Description</span>
+          <input id="planDesc" type="text" autocomplete="off" placeholder="Phone, refinance, emergency">
+        </label>
+        <div class="preview" id="planPreview" hidden>
+          <div><span>Resulting debt</span><strong id="previewDebt">$0.00</strong></div>
+          <div><span>Weekly payment</span><strong id="previewWeekly">-$0.00/wk</strong></div>
+          <div><span>Weekly spending</span><strong id="previewAvailable">$0.00</strong></div>
+        </div>
+        <button class="btn primary full" id="confirmPlanBtn" type="button" disabled>Confirm plan</button>
+      </article>
+
+      <article class="card form-card">
+        <h2>Pay From Reserve</h2>
+        <div class="form-grid two compact">
+          <label>
+            <span>Payment</span>
+            <input id="payAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="$">
+          </label>
+          <button class="btn secondary" id="maxPayBtn" type="button">Max</button>
+        </div>
+        <div class="preview" id="payPreview" hidden>
+          <div><span>Debt after payment</span><strong id="payDebt">$0.00</strong></div>
+          <div><span>Weekly payment</span><strong id="payWeekly">-$0.00/wk</strong></div>
+          <div><span>Reserve after payment</span><strong id="payReserve">$0.00</strong></div>
+        </div>
+        <button class="btn primary full" id="confirmPayBtn" type="button" disabled>Confirm payment</button>
+      </article>
+
+      <article class="list-card">
+        <div class="list-title">Credit Events</div>
+        <div id="debtEventsContainer"></div>
+      </article>
+    </section>
+
+    <section class="panel" id="panel-settings">
+      <article class="card form-card">
+        <h2>Budget Settings</h2>
+        <div class="form-grid two compact">
+          <label>
+            <span>Weekly budget</span>
+            <input id="budgetSetting" type="number" inputmode="decimal" min="1" step="10">
+          </label>
+          <button class="btn primary" id="saveBudgetBtn" type="button">Save</button>
+        </div>
+        <div class="form-grid two compact">
+          <label>
+            <span>Reserve bank</span>
+            <input id="reserveSetting" type="number" inputmode="decimal" step="0.01">
+          </label>
+          <button class="btn secondary" id="saveReserveBtn" type="button">Set</button>
+        </div>
+      </article>
+
+      <article class="card form-card">
+        <h2>Initial Debt Setup</h2>
+        <div class="form-grid two">
+          <label>
+            <span>Debt left</span>
+            <input id="setupDebt" type="number" inputmode="decimal" min="0" step="0.01">
+          </label>
+          <label>
+            <span>Weeks left</span>
+            <input id="setupWeeks" type="number" inputmode="numeric" min="0" step="1">
+          </label>
+        </div>
+        <button class="btn secondary full" id="setupDebtBtn" type="button">Set current debt</button>
+      </article>
+
+      <article class="card form-card">
+        <h2>Backup</h2>
+        <div class="backup-actions">
+          <button class="btn secondary" id="exportBtn" type="button">Export data</button>
+          <label class="btn secondary import-btn">
+            Import data
+            <input id="importFile" type="file" accept="application/json,.json">
+          </label>
+        </div>
+        <p class="settings-note" id="backupNote">Data stays on this device unless you export it.</p>
+      </article>
+
+      <article class="card form-card danger-zone">
+        <h2>Danger Zone</h2>
+        <button class="btn danger full" id="resetWeekBtn" type="button">Reset current week</button>
+        <button class="btn danger full" id="resetAllBtn" type="button">Reset everything</button>
+      </article>
+    </section>
+  </main>
+
+  <div class="bottom-warning" id="minusBanner" hidden>Negative reserve</div>
+
+  <script src="app.js"></script>
+</body>
+</html>
