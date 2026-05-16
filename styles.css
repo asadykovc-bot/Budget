@@ -138,8 +138,8 @@ h1 {
   margin-top: 8px;
   font-family: "Syne", system-ui, sans-serif;
   max-width: 100%;
-  overflow: hidden;
-  font-size: clamp(2.15rem, 10.8vw, 2.95rem);
+  overflow: visible;
+  font-size: clamp(2rem, 9.2vw, 2.55rem);
   font-weight: 800;
   line-height: 0.95;
   color: var(--green);
@@ -148,7 +148,7 @@ h1 {
 
 .big-money.debt {
   color: var(--yellow);
-  font-size: clamp(1.95rem, 10.2vw, 2.65rem);
+  font-size: clamp(1.9rem, 9vw, 2.45rem);
 }
 
 .muted-line,
@@ -492,11 +492,11 @@ input::placeholder {
   }
 
   .big-money {
-    font-size: clamp(2.05rem, 10.5vw, 2.75rem);
+    font-size: clamp(1.95rem, 9vw, 2.4rem);
   }
 
   .big-money.debt {
-    font-size: clamp(1.9rem, 10vw, 2.35rem);
+    font-size: clamp(1.8rem, 8.8vw, 2.25rem);
   }
 
   .form-grid.two {

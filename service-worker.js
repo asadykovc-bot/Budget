@@ -1,9 +1,9 @@
-const CACHE_NAME = "budget-pwa-v4";
+const CACHE_NAME = "budget-pwa-v5";
 const ASSETS = [
   "./",
   "./index.html",
-  "./styles.css?v=4",
-  "./app.js?v=4",
+  "./styles.css?v=5",
+  "./app.js?v=5",
   "./manifest.webmanifest",
   "./icon.svg"
 ];
